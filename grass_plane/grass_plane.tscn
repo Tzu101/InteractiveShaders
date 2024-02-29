@@ -1,0 +1,131 @@
+[gd_scene load_steps=23 format=3 uid="uid://dfgem1hl8ykk1"]
+
+[ext_resource type="Script" path="res://grass_plane/grass_plane.gd" id="1_8nukf"]
+[ext_resource type="Shader" path="res://grass_plane/grass_plane.gdshader" id="1_kaorb"]
+[ext_resource type="ArrayMesh" uid="uid://cowccb0kvbknq" path="res://grass_plane/grass_blade.res" id="2_e5oli"]
+[ext_resource type="Script" path="res://grass_plane/camera_view.gd" id="3_i4wvl"]
+[ext_resource type="Shader" path="res://grass_plane/grass_blade.gdshader" id="3_oq6ag"]
+[ext_resource type="Script" path="res://grass_plane/ball_move.gd" id="6_crw6w"]
+[ext_resource type="ArrayMesh" uid="uid://ciqbhwj0wnx3d" path="res://grass_plane/golfball_lowpoly.obj" id="7_wht6a"]
+[ext_resource type="Shader" path="res://grass_plane/ocean.gdshader" id="8_otdwf"]
+
+[sub_resource type="Environment" id="Environment_druod"]
+background_mode = 1
+background_color = Color(0.396078, 0.772549, 0.984314, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ulpf3"]
+render_priority = 0
+shader = ExtResource("3_oq6ag")
+
+[sub_resource type="MultiMesh" id="MultiMesh_fpgfy"]
+transform_format = 1
+use_custom_data = true
+mesh = ExtResource("2_e5oli")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_06hob"]
+render_priority = 0
+shader = ExtResource("1_kaorb")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_3osym"]
+subdivide_width = 75
+subdivide_depth = 75
+
+[sub_resource type="SeparationRayShape3D" id="SeparationRayShape3D_jjexk"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_bg3bq"]
+radius = 0.1
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_keuoe"]
+fractal_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_pp5e3"]
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_keuoe")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_oa62m"]
+noise_type = 3
+frequency = 0.0195
+fractal_type = 2
+fractal_octaves = 3
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_hdn7j"]
+seamless = true
+noise = SubResource("FastNoiseLite_oa62m")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sq32r"]
+render_priority = 0
+shader = ExtResource("8_otdwf")
+shader_parameter/water_color = Color(0.230177, 0.408237, 0.933371, 1)
+shader_parameter/water_noise = SubResource("NoiseTexture2D_pp5e3")
+shader_parameter/wave_noise = SubResource("NoiseTexture2D_hdn7j")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_2pt8m"]
+lightmap_size_hint = Vector2i(102, 102)
+material = SubResource("ShaderMaterial_sq32r")
+size = Vector2(20, 20)
+subdivide_width = 100
+subdivide_depth = 100
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_h34k3"]
+size = Vector3(10, 0, 10)
+
+[node name="GrassPlane" type="Node3D"]
+script = ExtResource("1_8nukf")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_druod")
+
+[node name="Camera" type="Camera3D" parent="."]
+transform = Transform3D(-0.766044, 0.321394, -0.556671, 0, 0.866025, 0.5, 0.642788, 0.383022, -0.663414, 0.14563, 0.857239, -0.823611)
+script = ExtResource("3_i4wvl")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.907777, 0.419452, 0, -0.419452, 0.907777, 0, 2.21399, 4.395)
+light_color = Color(0.894118, 0.894118, 0, 1)
+
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="Grass" type="MultiMeshInstance3D" parent="Ground"]
+material_override = SubResource("ShaderMaterial_ulpf3")
+multimesh = SubResource("MultiMesh_fpgfy")
+
+[node name="Terrain" type="MeshInstance3D" parent="Ground"]
+material_override = SubResource("ShaderMaterial_06hob")
+mesh = SubResource("PlaneMesh_3osym")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("SeparationRayShape3D_jjexk")
+
+[node name="Ball" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+wall_min_slide_angle = 3.14159
+floor_stop_on_slope = false
+floor_block_on_wall = false
+floor_max_angle = 3.14159
+floor_snap_length = 1.0
+script = ExtResource("6_crw6w")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ball"]
+shape = SubResource("SphereShape3D_bg3bq")
+
+[node name="GolfballLowpoly" type="MeshInstance3D" parent="Ball"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, -0.1, 0)
+mesh = ExtResource("7_wht6a")
+skeleton = NodePath("../..")
+
+[node name="Ocean" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
+
+[node name="Water" type="MeshInstance3D" parent="Ocean"]
+mesh = SubResource("PlaneMesh_2pt8m")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ocean"]
+shape = SubResource("BoxShape3D_h34k3")
+
+[connection signal="body_entered" from="Ocean" to="Ball" method="_on_ocean_body_entered"]
+[connection signal="body_exited" from="Ocean" to="Ball" method="_on_ocean_body_exited"]

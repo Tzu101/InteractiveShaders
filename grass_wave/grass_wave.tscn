@@ -1,0 +1,13 @@
+[gd_scene load_steps=4 format=3 uid="uid://dojltvpvt5bnw"]
+
+[ext_resource type="Shader" path="res://grass_wave/grass_wave.gdshader" id="1_4qy6v"]
+[ext_resource type="Texture2D" uid="uid://cwlxo824f2obk" path="res://grass_wave/tall_grass.png" id="2_qwcsa"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_kvma6"]
+shader = ExtResource("1_4qy6v")
+
+[node name="GrassWave" type="Sprite2D"]
+material = SubResource("ShaderMaterial_kvma6")
+position = Vector2(552, 347)
+scale = Vector2(0.804094, 0.771605)
+texture = ExtResource("2_qwcsa")

@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://lbm48fvdfqcx"]
+
+[ext_resource type="Texture2D" uid="uid://c4xfskjxfuhoa" path="res://color_swap/phone_greenscreen.png" id="1_1v3cg"]
+[ext_resource type="Script" path="res://color_swap/color_swap.gd" id="1_ynsii"]
+[ext_resource type="Shader" path="res://color_swap/color_swap.gdshader" id="3_twssx"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_w4m14"]
+shader = ExtResource("3_twssx")
+shader_parameter/replacement_color = Color(0, 0.603922, 0.494118, 1)
+
+[node name="ColorSwap" type="Node2D"]
+script = ExtResource("1_ynsii")
+
+[node name="Greenscreen" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_w4m14")
+position = Vector2(354, 314)
+texture = ExtResource("1_1v3cg")
+
+[node name="ColorPicker" type="ColorPicker" parent="."]
+offset_left = 788.0
+offset_top = 38.0
+offset_right = 1086.0
+offset_bottom = 614.0
+
+[connection signal="color_changed" from="ColorPicker" to="." method="_on_color_picker_color_changed"]
